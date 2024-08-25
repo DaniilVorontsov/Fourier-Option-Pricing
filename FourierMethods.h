@@ -10,11 +10,10 @@
 
 #include <random>
 
-#include <cuda_runtime.h>
-#include <curand_kernel.h>  // Include the CURAND header
-
 #include <boost/lambda/lambda.hpp>
 #include <boost/math/special_functions/gamma.hpp> //boost library
+
+#include "Spline.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -25,6 +24,7 @@ const complex<double> i(0.0, 1.0);
 typedef complex<double> Complex;
 typedef vector<double> Double_v;
 typedef vector<Complex> Complex_v;
+typedef vector<int> Int_v;
 
 
 double N(double x);
@@ -39,8 +39,8 @@ public:
 
 	/////Carr Madan
 	double PriceByCarrMadanDirect(double K, double T, double alpha, int N, double eps, bool CallFlag);
-	Double_v PricesByCarrMadanFFT(Double_v K_grid, double T, double dk, double alpha, int N, bool CallFlag);
-	double PriceByFST(double K, double T, int N, bool CallFlag);
+	Double_v PricesByCarrMadanFFT(Double_v K_grid, double T, double dk, double alpha, int N, bool CallFlag, bool splineFlag);
+	double PriceByFST(double K, double T, int N, bool CallFlag, bool splineFlag);
 	double PriceByCOS(double K, double T, int N, bool CallFlag);
 
 

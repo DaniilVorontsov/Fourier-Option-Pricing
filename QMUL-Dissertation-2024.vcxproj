@@ -79,18 +79,22 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CudaCompile Include="CGMY_MC.cu" />
+    <CudaCompile Include="CGMY_CUDA2.cu" />
+    <CudaCompile Include="CGMY_CUDA1.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FFT.h" />
     <ClInclude Include="FourierMethods.h" />
     <ClInclude Include="LinearInterpolation.h" />
+    <ClInclude Include="Spline.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CGMY.cpp" />
     <ClCompile Include="FFT.cpp" />
     <ClCompile Include="FourierMethods.cpp" />
     <ClCompile Include="LinearInterpolation.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="VG.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

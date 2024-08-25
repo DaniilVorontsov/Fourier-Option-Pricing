@@ -58,8 +58,7 @@ double LevyMarket::PriceByCarrMadanDirect(double K, double T, double alpha, int 
 	return (CallFlag) ? price : price + K * exp(-r * T) - S0 * exp(-q * T);
 }
 
-
-Double_v LevyMarket::PricesByCarrMadanFFT(Double_v K_grid, double T, double dk, double alpha, int N, bool CallFlag)
+Double_v LevyMarket::PricesByCarrMadanFFT(Double_v K_grid, double T, double dk, double alpha, int N, bool CallFlag, bool splineFlag)
 {
 	double dv = 2 * pi / (N * dk);
 	double v_max = dv * N;
@@ -96,22 +95,26 @@ Double_v LevyMarket::PricesByCarrMadanFFT(Double_v K_grid, double T, double dk, 
 	FFT(x_fft);
 
 	LinearInterpolation li;
+
 	Double_v x(N), y(N);
 	for (int j = 0; j < N; j++)
 	{
 		x[j] = exp(k_grid_atm[j]);
 		y[j] = exp(-alpha * k_grid_atm[j]) / pi * real(x_fft[j]);
-		li.AddPoint(x[j], y[j]);
+		if (!splineFlag) li.AddPoint(x[j], y[j]);
 	}
 
 	//spline interpolation
-	//tk::spline s(x, y);
+	tk::spline s(x, y);
 
 	Double_v CM_prices(K_grid.size());
 	for (int j = 0; j < K_grid.size(); j++)
 	{
-		//CM_prices[j] = s(K_grid[j]);
-		double price = li.value(K_grid[j]);
+		double price;
+		
+		if (splineFlag) price = s(K_grid[j]);
+		else price = li.value(K_grid[j]);
+
 		CM_prices[j] = (CallFlag) ? price : price + K_grid[j] * exp(-r * T) - S0 * exp(-q * T);
 	}
 
@@ -119,7 +122,7 @@ Double_v LevyMarket::PricesByCarrMadanFFT(Double_v K_grid, double T, double dk, 
 }
 
 ///////////////////////////FST METHOD///////////////////////////
-double LevyMarket::PriceByFST(double K, double T, int N, bool CallFlag)
+double LevyMarket::PriceByFST(double K, double T, int N, bool CallFlag, bool splineFlag)
 //Double_v FST_European_VarianceGamma(Double_v K_grid, double S0, double r, double T, double sigma, double theta, double nu, double q, int N)
 {
 	double mu = r + w() - q;
@@ -172,10 +175,11 @@ double LevyMarket::PriceByFST(double K, double T, int N, bool CallFlag)
 		li.AddPoint(s[j], v_option[j]);
 	}
 
-	//tk::spline option_spline(s, v_option);
-	//FSTprice = option_spline(S0);
+	tk::spline option_spline(s, v_option);
 
-	FSTprice = li.value(S0);
+	if(splineFlag) FSTprice = option_spline(S0);
+	else FSTprice = li.value(S0);
+
 	return FSTprice;
 }
 
@@ -324,8 +328,8 @@ double CGMYmarket::PriceByMonteCarlo(double K, double T, int N_sim, bool CallFla
 	double b = L * sqrt(T);
 
 	int J = int(1e3);
-	double x_min = -2.6;
-	double x_max = 1.16;
+	double x_min = -4;
+	double x_max = 4;
 	double dx = (x_max - x_min) / J;
 
 	Double_v x(J);
@@ -348,10 +352,8 @@ double CGMYmarket::PriceByMonteCarlo(double K, double T, int N_sim, bool CallFla
 	for (int j = 0; j < f_x.size(); j++)
 	{
 		F_j += (j == 0) ? 0 : f_x[j] * dx;
-		//F_x[j] = F_j;
 		//CGMYdensity << x[j] << "\t" << f_x[j] << "\t" << F_x[j] << "\n";
-		if (0.01 <= F_j && F_j <= 0.99) li.AddPoint(F_j, x[j]);
-		
+		if (0.05 <= F_j && F_j <= 0.95) li.AddPoint(F_j, x[j]);
 	}
 
 	double mu = r + w() - q;
