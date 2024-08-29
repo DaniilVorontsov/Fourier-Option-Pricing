@@ -27,6 +27,17 @@ double N(double x)
 }
 
 
+Complex CF_CGMY(Complex u, double T, double S0, double r, double q, double C, double G, double M, double Y)
+{
+	double w = -C * tgamma(-Y) * (pow(M - 1, Y) - pow(M, Y) + pow(G + 1, Y) - pow(G, Y));
+	double mu = r + w - q;
+	Complex phi_CGMY = exp(C * T * tgamma(-Y) * (pow(M - i * u, Y) - pow(M, Y) + pow(G + i * u, Y) - pow(G, Y)));
+	return /*exp(i * u * (log(S0) + mu * T)) * */phi_CGMY;
+}
+
+
+
+
 ///////////////////////////CARR MADAN FORMULA///////////////////////////
 Complex LevyMarket::CarrMadanPsi(double v, double alpha, double T)
 {
@@ -102,6 +113,7 @@ Double_v LevyMarket::PricesByCarrMadanFFT(Double_v K_grid, double T, double dk, 
 		x[j] = exp(k_grid_atm[j]);
 		y[j] = exp(-alpha * k_grid_atm[j]) / pi * real(x_fft[j]);
 		if (!splineFlag) li.AddPoint(x[j], y[j]);
+
 	}
 
 	//spline interpolation
@@ -111,11 +123,14 @@ Double_v LevyMarket::PricesByCarrMadanFFT(Double_v K_grid, double T, double dk, 
 	for (int j = 0; j < K_grid.size(); j++)
 	{
 		double price;
-		
+
 		if (splineFlag) price = s(K_grid[j]);
 		else price = li.value(K_grid[j]);
 
 		CM_prices[j] = (CallFlag) ? price : price + K_grid[j] * exp(-r * T) - S0 * exp(-q * T);
+
+		//cout << K_grid[j] << '\t' << price << endl;
+
 	}
 
 	return CM_prices;
@@ -177,7 +192,7 @@ double LevyMarket::PriceByFST(double K, double T, int N, bool CallFlag, bool spl
 
 	tk::spline option_spline(s, v_option);
 
-	if(splineFlag) FSTprice = option_spline(S0);
+	if (splineFlag) FSTprice = option_spline(S0);
 	else FSTprice = li.value(S0);
 
 	return FSTprice;
@@ -233,11 +248,10 @@ Double_v LevyMarket::HCoef(double a, double b, int N, bool CallPut)
 }
 
 
-double LevyMarket::PriceByCOS(double K, double T, int N, bool CallFlag)
+double LevyMarket::PriceByCOS(double K, double T, int N, double L, bool CallFlag)
 {
 	double mu = r + w() - q;
 
-	double L = 8; //standard range from paper and book
 	double price = 0;
 	double x0 = log(S0 / K);
 
@@ -321,9 +335,8 @@ Double_v CGMYmarket::CGMYdensityByCOS(Double_v x, int N, double T, double a, dou
 	return f;
 }
 
-double CGMYmarket::PriceByMonteCarlo(double K, double T, int N_sim, bool CallFlag)
+double CGMYmarket::PriceByMonteCarlo(double K, double T, int N_sim, double L, bool CallFlag)
 {
-	double L = 8;
 	double a = -L * sqrt(T);
 	double b = L * sqrt(T);
 
