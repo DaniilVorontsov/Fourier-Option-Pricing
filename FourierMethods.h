@@ -13,6 +13,8 @@
 #include <boost/lambda/lambda.hpp>
 #include <boost/math/special_functions/gamma.hpp> //boost library
 
+
+#include"LinearInterpolation.h"
 #include "Spline.h"
 
 using namespace std;

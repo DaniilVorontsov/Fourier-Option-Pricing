@@ -1,7 +1,7 @@
 
 #include"FourierMethods.h"
 #include"FFT.h"
-#include"LinearInterpolation.h"
+
 
 
 ///////////////////////////////////BSM PRICE///////////////////////////////////
@@ -34,9 +34,6 @@ Complex CF_CGMY(Complex u, double T, double S0, double r, double q, double C, do
 	Complex phi_CGMY = exp(C * T * tgamma(-Y) * (pow(M - i * u, Y) - pow(M, Y) + pow(G + i * u, Y) - pow(G, Y)));
 	return /*exp(i * u * (log(S0) + mu * T)) * */phi_CGMY;
 }
-
-
-
 
 ///////////////////////////CARR MADAN FORMULA///////////////////////////
 Complex LevyMarket::CarrMadanPsi(double v, double alpha, double T)

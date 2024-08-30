@@ -1,4 +1,6 @@
+
 #include"FourierMethods.h"
+
 
 double CGMY_COS_CUDA(double S0, double  K, double  T, double  r, double  C, double  G, double  M, double  Y, double q, double L, int N_sim);
 double CGMY_CDF_CUDA(double S0, double  K, double  T, double  r, double  C, double  G, double  M, double  Y, double q, double D, int N_sim);
@@ -39,7 +41,7 @@ void CGMY(bool errorFlag, bool timeFlag)
 	{
 		ofstream CGMY_Errors("CGMY_Errors.csv"); CGMY_Errors << "N\tK\tTruePrice\tCM\tFST\tCOS\tMCFT1\tMCFT2\tSET\n";
 
-		//////////////SET 1////////////// -- Robust Numerical Valuation of CGMY options (2007). Ref price: 4.3714..
+		//////////////SET 1////////////// -- Robust Numerical Valuation of CGMY options (2007). Ref price (put): 4.3714..
 		cout << "SET 1\n";
 		S0 = 10, K = 10, T = 0.25, r = 0.1, q = 0.0, C = 1, G = 8.8, M = 9.2, Y = 1.8;
 
@@ -102,7 +104,7 @@ void CGMY(bool errorFlag, bool timeFlag)
 		cout << "Pricing CGMY SET 2 finished\n";
 
 
-		//////////////SET 3////////////// -- Monte Carlo Simulation of the CGMY Process and Option Pricing. (2013) Ref. price: 14.0691..
+		//////////////SET 3////////////// -- Monte Carlo Simulation of the CGMY Process and Option Pricing. (2013) Ref. price (put): 14.0691..
 		cout << "\nSET 3\n";
 		S0 = 100, K = 100, T = 1, r = 0.04, q = 0.0, C = 0.5, G = 2.0, M = 3.5, Y = 0.5;
 

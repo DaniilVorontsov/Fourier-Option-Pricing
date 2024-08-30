@@ -3,11 +3,59 @@
 #include <curand_kernel.h>  // Include the CURAND header
 
 #include"FourierMethods.h"
+#include"FFT.h"
 
 
 
+void FFT_CGMY_PDF(double* x, double* f, int N_points, int N_FFT_TERMS ,double u_max, double T, double S0, double r, double q, double C, double G, double M, double Y)
+{
+	double x_min = x[0];
+	double du = u_max / N_FFT_TERMS;
+	double dx = 2 * pi / (N_FFT_TERMS * du);
 
-void COS_CGMY_pdf(double* x, double* f, int J, int N, double T, double S0, double r, double q, double C, double G, double M, double Y, double a, double b)
+	Complex_v F(N_FFT_TERMS);
+	for (int k = 0; k < N_FFT_TERMS; k++)
+	{
+		double u = du * k;
+		F[k] = CF_CGMY(u, T, S0, r, q, C, G, M, Y);
+	}
+
+
+	Complex_v phi(N_FFT_TERMS), phi_boundary(N_FFT_TERMS);
+	for (int k = 0; k < N_FFT_TERMS; ++k) {
+		double x = x_min + dx * k;
+		double u = du * k;
+		phi[k] = exp(-i * x_min * u) * F[k];
+		Complex gamma1 = F[0];
+		Complex gamma2 = exp(-i * x * u_max) * F[N_FFT_TERMS - 1];
+		phi_boundary[k] = 0.5 * (gamma1 + gamma2);
+	}
+
+	FFT(phi);
+	LinearInterpolation li;
+	Double_v f_adj(N_points), x_adj(N_points);
+	for (int k = 0; k < N_points; k++)
+	{
+		double x_k = x_min + dx * k;
+		double f_k = real(phi[k] - phi_boundary[k]) * du / pi;
+		f_adj[k] = f_k;
+		x_adj[k] = x_k;
+		li.AddPoint(x_k, f_k);
+	}
+
+	//tk::spline s(x_adj, f_adj);	//spline interpolation
+
+	//Double_v f(N_points);
+	for (int k = 0; k < N_points; k++)
+	{
+		f[k] = li.value(x[k]);
+		//f[k] = s(x[k]);
+	}
+}
+
+
+
+void COS_CGMY_pdf(double* x, double* f, int N_points, int N, double T, double S0, double r, double q, double C, double G, double M, double Y, double a, double b)
 {
 	Double_v F;
 	for (int k = 0; k < N; k++)
@@ -20,7 +68,7 @@ void COS_CGMY_pdf(double* x, double* f, int J, int N, double T, double S0, doubl
 	}
 	F[0] *= 0.5;
 
-	for (int k = 0; k < J; k++)
+	for (int k = 0; k < N_points; k++)
 	{
 		double x_k = x[k];
 		double f_x = 0;
@@ -36,12 +84,12 @@ void COS_CGMY_pdf(double* x, double* f, int J, int N, double T, double S0, doubl
 
 // CUDA kernel function to price CGMY option
 __global__ void PriceByMC(float* price, double S0, double r, double q, double w, double T, double K, int N_sim, double* ST) {
-	unsigned int tid = threadIdx.x + blockIdx.x * blockDim.x;
+	unsigned int idx = threadIdx.x + blockIdx.x * blockDim.x;
 	unsigned int totalThreads = blockDim.x * gridDim.x;
 
 	float localPrice = 0;
 
-	for (int i = tid; i < N_sim; i += totalThreads)
+	for (int i = idx; i < N_sim; i += totalThreads)
 	{
 		double S = S0 * exp((r - q + w) * T + ST[i]);
 		double payoff = max(K - S, 0.0);
@@ -124,7 +172,8 @@ double CGMY_COS_CUDA(double S0, double  K, double  T, double  r, double  C, doub
 
 	double* f_x = new double[N_points];
 
-	COS_CGMY_pdf(h_x, f_x, N_points, N_COS_TERMS, T, S0, r, q, C, G, M, Y, a, b);
+	//COS_CGMY_pdf(h_x, f_x, N_points, N_COS_TERMS, T, S0, r, q, C, G, M, Y, a, b);
+	FFT_CGMY_PDF(h_x, f_x, N_points, N_COS_TERMS , 20, T, S0, r, q, C, G, M, Y);
 
 	int J_size = 0;
 	double F_j = f_x[0];
@@ -132,6 +181,7 @@ double CGMY_COS_CUDA(double S0, double  K, double  T, double  r, double  C, doub
 	{
 		F_j += (j == 0) ? 0 : f_x[j] * dx;
 		if (0.05 <= F_j && F_j <= 0.95) J_size += 1;
+		//cout << h_x[j] << '\t' << F_j << endl;
 	}
 
 	double* F_x;

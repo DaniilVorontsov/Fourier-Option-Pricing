@@ -5,9 +5,9 @@ void VG(bool errorFlag, bool timeFlag)
 	//initialize strike grid
 	double lb = 80;
 	double rb = 120;
-	int L = 50;
-	Double_v K_grid(L + 1);
-	for (int j = 0; j <= L; j++) K_grid[j] = lb + j * (rb - lb) / L;
+	int N_strikes = 50;
+	Double_v K_grid(N_strikes + 1);
+	for (int j = 0; j <= N_strikes; j++) K_grid[j] = lb + j * (rb - lb) / N_strikes;
 
 
 	//SET 1 -- Option Valuation Using the Fast Fourier Transform (1999)
@@ -26,7 +26,7 @@ void VG(bool errorFlag, bool timeFlag)
 	double alpha(1.5), dk(0.0125), eps(1e-2); //Carr Madan parameters
 	bool splineFlag = true;					 //spline interpolation in FFT and FST
 
-	double D = 10; //integration range in COS method
+	double L = 8; //integration range in COS method
 
 	///////////////////////////ERROR ANALYSIS///////////////////////////
 
@@ -44,7 +44,7 @@ void VG(bool errorFlag, bool timeFlag)
 			{
 				double truePrice = VGoption1.PriceByIntegrationVG(K_grid[j], T, CallFlag);
 				double FSTprice = VGoption1.PriceByFST(K_grid[j], T, N, CallFlag, splineFlag);
-				double COSprice = VGoption1.PriceByCOS(K_grid[j], T, N, D, CallFlag);
+				double COSprice = VGoption1.PriceByCOS(K_grid[j], T, N, L, CallFlag);
 
 				VG_Errors << N << '\t' << K_grid[j] << '\t' << truePrice << '\t' << CMprices1[j] << '\t' << FSTprice << '\t' << COSprice << "\t1\n";
 			}
@@ -62,7 +62,7 @@ void VG(bool errorFlag, bool timeFlag)
 			{
 				double truePrice = VGoption2.PriceByIntegrationVG(K_grid[j], T, CallFlag);
 				double FSTprice = VGoption2.PriceByFST(K_grid[j], T, N, CallFlag, splineFlag);
-				double COSprice = VGoption2.PriceByCOS(K_grid[j], T, N, D, CallFlag);
+				double COSprice = VGoption2.PriceByCOS(K_grid[j], T, N, L, CallFlag);
 
 				VG_Errors << N << '\t' << K_grid[j] << '\t' << truePrice << '\t' << CMprices2[j] << '\t' << FSTprice << '\t' << COSprice << "\t2\n";
 			}
@@ -113,7 +113,7 @@ void VG(bool errorFlag, bool timeFlag)
 				FSTtime = min(FSTtime, duration_cast<milliseconds>(stop - start).count());
 
 				start = high_resolution_clock::now();
-				for (int j = 0; j < K_grid.size(); j++) double COSprice = VGoption1.PriceByCOS(K_grid[j], T, N, D, CallFlag);
+				for (int j = 0; j < K_grid.size(); j++) double COSprice = VGoption1.PriceByCOS(K_grid[j], T, N, L, CallFlag);
 				stop = high_resolution_clock::now();
 				COStime = min(COStime, duration_cast<milliseconds>(stop - start).count());
 			}
@@ -155,7 +155,7 @@ void VG(bool errorFlag, bool timeFlag)
 				FSTtime = min(FSTtime, duration_cast<milliseconds>(stop - start).count());
 
 				start = high_resolution_clock::now();
-				for (int j = 0; j < K_grid.size(); j++) double COSprice = VGoption2.PriceByCOS(K_grid[j], T, N, D, CallFlag);
+				for (int j = 0; j < K_grid.size(); j++) double COSprice = VGoption2.PriceByCOS(K_grid[j], T, N, L, CallFlag);
 				stop = high_resolution_clock::now();
 				COStime = min(COStime, duration_cast<milliseconds>(stop - start).count());
 			}
