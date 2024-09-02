@@ -38,7 +38,7 @@ public:
 	~LevyMarket() {};
 
 	/////Carr Madan
-	double PriceByCarrMadanDirect(double K, double T, double alpha, int N, double eps, bool CallFlag);
+	double PriceByCarrMadanDirect(double K, double T, double alpha, int N, double eps, bool CallFlag); // price option by direct
 	Double_v PricesByCarrMadanFFT(Double_v K_grid, double T, double dk, double alpha, int N, bool CallFlag, bool splineFlag);
 	double PriceByFST(double K, double T, int N, bool CallFlag, bool splineFlag);
 	double PriceByCOS(double K, double T, int N, bool CallFlag);

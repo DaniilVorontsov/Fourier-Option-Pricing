@@ -5,9 +5,11 @@ void CGMY();
 
 int main()
 {
+	bool errorFlag = true;
+	bool timeFlag = false;
 
-	//VG();
-	CGMY();
+	//VG(errorFlag, timeFlag);
+	CGMY(errorFlag, timeFlag);
 
 	return 0;
 }
