@@ -79,13 +79,8 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-<<<<<<< Updated upstream
     <CudaCompile Include="CGMY_CUDA2.cu" />
     <CudaCompile Include="CGMY_CUDA1.cu" />
-=======
-    <CudaCompile Include="MCFT2.cu" />
-    <CudaCompile Include="MCFT1.cu" />
->>>>>>> Stashed changes
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FFT.h" />

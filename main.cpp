@@ -1,6 +1,6 @@
 
-void VG();
-void CGMY();
+void VG(bool errorFlag, bool timeFlag);
+void CGMY(bool errorFlag, bool timeFlag);
 
 
 int main()

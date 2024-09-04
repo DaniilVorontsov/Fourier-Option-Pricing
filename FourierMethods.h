@@ -13,6 +13,8 @@
 #include <boost/lambda/lambda.hpp>
 #include <boost/math/special_functions/gamma.hpp> //boost library
 
+
+#include"LinearInterpolation.h"
 #include "Spline.h"
 
 using namespace std;
@@ -29,6 +31,7 @@ typedef vector<int> Int_v;
 
 double N(double x);
 double BSM_price(double K, double T, double S0, double r, double q, double sigma);
+Complex CF_CGMY(Complex u, double T, double S0, double r, double q, double C, double G, double M, double Y);
 
 
 class LevyMarket
@@ -41,7 +44,7 @@ public:
 	double PriceByCarrMadanDirect(double K, double T, double alpha, int N, double eps, bool CallFlag); // price option by direct
 	Double_v PricesByCarrMadanFFT(Double_v K_grid, double T, double dk, double alpha, int N, bool CallFlag, bool splineFlag);
 	double PriceByFST(double K, double T, int N, bool CallFlag, bool splineFlag);
-	double PriceByCOS(double K, double T, int N, bool CallFlag);
+	double PriceByCOS(double K, double T, int N, double L, bool CallFlag);
 
 
 protected:
@@ -92,7 +95,7 @@ class CGMYmarket : public LevyMarket
 public:
 	CGMYmarket(double S0_, double r_, double q_, double C_, double G_, double M_, double Y_) : LevyMarket(S0_, r_, q_), C(C_), G(G_), M(M_), Y(Y_) {};
 	~CGMYmarket() {};
-	double PriceByMonteCarlo(double K, double T, int N_sim, bool CallFlag);
+	double PriceByMonteCarlo(double K, double T, int N_sim, double D, bool CallFlag);
 
 private:
 	double C, G, M, Y;
