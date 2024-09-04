@@ -27,6 +27,16 @@ double N(double x)
 }
 
 
+Complex CF_CGMY(Complex u, double T, double S0, double r, double q, double C, double G, double M, double Y)
+{
+	double w = -C * tgamma(-Y) * (pow(M - 1, Y) - pow(M, Y) + pow(G + 1, Y) - pow(G, Y));
+	double mu = r + w - q;
+	Complex phi_CGMY = exp(C * T * tgamma(-Y) * (pow(M - i * u, Y) - pow(M, Y) + pow(G + i * u, Y) - pow(G, Y)));
+	return /*exp(i * u * (log(S0) + mu * T)) * */phi_CGMY;
+}
+
+
+
 ///////////////////////////CARR MADAN FORMULA///////////////////////////
 Complex LevyMarket::CarrMadanPsi(double v, double alpha, double T)
 {
@@ -117,6 +127,7 @@ Double_v LevyMarket::PricesByCarrMadanFFT(Double_v K_grid, double T, double dk, 
 		else price = li.value(K_grid[j]);
 
 		CM_prices[j] = (CallFlag) ? price : price + K_grid[j] * exp(-r * T) - S0 * exp(-q * T);
+
 	}
 
 	return CM_prices;
