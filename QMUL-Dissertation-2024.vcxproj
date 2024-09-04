@@ -79,8 +79,8 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CudaCompile Include="CGMY_CUDA2.cu" />
-    <CudaCompile Include="CGMY_CUDA1.cu" />
+    <CudaCompile Include="MSFT2.cu" />
+    <CudaCompile Include="MSFT1.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FFT.h" />
