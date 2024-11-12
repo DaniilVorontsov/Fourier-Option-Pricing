@@ -18,7 +18,7 @@
 #include "Spline.h"
 
 using namespace std;
-using namespace std::chrono;
+using namespace std::chrono; //to measure performance
 
 const double pi = 4 * atan(1);
 const complex<double> i(0.0, 1.0);
