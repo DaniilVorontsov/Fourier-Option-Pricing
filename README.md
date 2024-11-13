@@ -1,3 +1,7 @@
+**Fourier transform methods for option pricing**
+The MSc thesis was concerned with option pricing under exponential Lévy jump models. Three renowned methods were implemented in C++ for two Variance Gamma and CGMY processes. For further information please refer to the PDF report.
+
+**The contents of the project**
 One base class LevyMarket contains all three Fourier transform pricing methods implementations. LevyMarket contains virtual functions CF (Characteristic Function) and CE (Characteristic Exponent) which are defined in inheritance classes VarianceGammaMarket and CGMYmarket. VarianceGammaMarket class corresponds to the Variance Gamma model. Apart from CF and CE, it has a method for analytical price integration. CGMYmarket class corresponds to the CGMY model. Apart from CF and CE, it has a CPU implementation of MCFT-1.
 CUDA part is located in .cu files where functions MCFT1 and MCFT2 are defined. This functions are called in files VG.cpp and CGMY.cpp. For VG analytical pricing Boost library is required.
 
